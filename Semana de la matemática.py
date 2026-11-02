@@ -8,30 +8,27 @@ import os
 # Configuración inicial de la página
 st.set_page_config(page_title="Semana de la Matemática LCC", page_icon="🧮", layout="wide")
 
-# Cabecera con imágenes ajustadas
-col_ib, col_logo, col_tit, col_iconos, col_carmelin = st.columns([0.8, 0.8, 3.5, 1.5, 1])
+# CSS para mantener columnas horizontales en celulares
+st.markdown("""
+    <style>
+        @media (max-width: 640px) {
+            [data-testid="column"] {
+                min-width: calc(33% - 1rem) !important; 
+                flex: 1 1 calc(33% - 1rem) !important; 
+            }
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-with col_ib:
-    if os.path.exists("ib.png"): 
-        st.image("ib.png", width=80) 
+# Cabecera con imágenes ajustadas (simplificada para móviles)
+col_logo, col_tit = st.columns([1, 4])
+
 with col_logo:
     if os.path.exists("logo.png"): 
         st.image("logo.png", width=80) 
 with col_tit:
-    st.title("🏆Semana de la Matemática Liceo Carmela Carvajal")
+    st.title("🏆 Semana de la Matemática Liceo Carmela Carvajal")
     st.subheader("Departamento de matemática")
-with col_iconos:
-    st.write("") 
-    c_pi, c_e, c_phi = st.columns(3)
-    with c_pi:
-        if os.path.exists("pi.png"): st.image("pi.png", width=75) 
-    with c_e:
-        if os.path.exists("e.png"): st.image("e.png", width=75)
-    with c_phi:
-        if os.path.exists("phi.png"): st.image("phi.png", width=75)
-with col_carmelin:
-    if os.path.exists("carmelin.png"): 
-        st.image("carmelin.png", width=130) 
 
 st.divider()
 
@@ -152,11 +149,11 @@ if not df.empty:
     
     st.divider()
 
-    # 3. Gráficos y Rankings Colectivos
-    col_izq, col_der = st.columns(2)
+    # 3. Gráficos y Rankings Colectivos (Convertido a Pestañas)
+    tab_grafico, tab_ranking = st.tabs(["📊 Gráfico por Curso", "🥇 Top 10 Estudiantes"])
     
-    with col_izq:
-        st.header("📊 Puntaje por Curso")
+    with tab_grafico:
+        st.header("Puntaje por Curso")
         puntaje_curso = df.groupby('Curso')['Puntaje_Obtenido'].sum().reset_index()
         puntaje_curso = puntaje_curso.sort_values(by='Puntaje_Obtenido', ascending=True)
         
@@ -167,8 +164,8 @@ if not df.empty:
         fig_cursos.update_layout(xaxis_title="Puntaje Total", yaxis_title="")
         st.plotly_chart(fig_cursos, use_container_width=True)
 
-    with col_der:
-        st.header("🥇 Top 10 Estudiantes Destacados")
+    with tab_ranking:
+        st.header("Top 10 Estudiantes Destacados")
         top_estudiantes = df.groupby(['Nombre completo', 'Curso'])['Puntaje_Obtenido'].sum().reset_index()
         top_estudiantes = top_estudiantes.sort_values(by='Puntaje_Obtenido', ascending=False).head(10)
         df_top_mostrar = top_estudiantes.rename(columns={'Nombre completo': 'Estudiante', 'Puntaje_Obtenido': 'Puntaje'})
